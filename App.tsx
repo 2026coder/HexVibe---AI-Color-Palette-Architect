@@ -27,9 +27,9 @@ const App: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  // Initialize colors
+  // Initialize colors - Using 6 colors for a cleaner 3x2 grid
   useEffect(() => {
-    const initialColors = Array.from({ length: 5 }, () => ({
+    const initialColors = Array.from({ length: 6 }, () => ({
       hex: generateRandomHex(),
       locked: false
     }));
@@ -45,14 +45,13 @@ const App: React.FC = () => {
   }, []);
 
   const handleHarmonyClick = (type: 'ANALOGOUS' | 'COMPLEMENTARY' | 'MONOCHROMATIC' | 'TRIADIC') => {
-    // Use the first color as base, or the first unlocked color
     const baseColor = colors.find(c => c.locked)?.hex || colors[0].hex;
     const harmonyHexes = generateHarmony(baseColor, type);
     
     setColors(prev => prev.map((c, i) => ({
       ...c,
       hex: harmonyHexes[i] || generateRandomHex(),
-      locked: i === 0 ? c.locked : false // Keep the first color's lock state if it was base
+      locked: i === 0 ? c.locked : false
     })));
   };
 
@@ -109,7 +108,7 @@ const App: React.FC = () => {
       if (newHexes.length > 0) {
         setColors(prev => prev.map((c, i) => ({
           ...c,
-          hex: newHexes[i] || c.hex,
+          hex: newHexes[i] || generateRandomHex(),
           locked: false
         })));
         savePalette();
@@ -122,7 +121,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Keyboard support: Space to generate
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' && (e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
@@ -136,7 +134,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300 dark:bg-slate-950">
-      {/* Header */}
       <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -183,113 +180,109 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col md:flex-row p-3 md:p-6 gap-4 md:h-[calc(100vh-120px)] overflow-y-auto md:overflow-hidden">
-        {/* Color Palette Display */}
-        <div className="flex-1 grid grid-cols-2 md:flex md:flex-row gap-2 md:gap-0 rounded-2xl overflow-hidden shadow-2xl border border-white dark:border-slate-800">
-          {colors.map((color, idx) => (
-            <div 
-              key={idx} 
-              className={`md:flex-1 ${idx === colors.length - 1 && colors.length % 2 !== 0 ? 'col-span-2' : ''}`}
-            >
+      <main className="flex-1 flex flex-col md:flex-row p-4 md:p-8 gap-8 max-w-[1600px] mx-auto w-full">
+        {/* Color Palette Display - Updated to 3-column square grid */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {colors.map((color, idx) => (
               <ColorCard 
+                key={idx}
                 hex={color.hex}
                 isLocked={color.locked}
                 onToggleLock={() => handleToggleLock(idx)}
                 onCopy={handleCopy}
                 isCopied={copiedHex === color.hex}
               />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Sidebar / Controls */}
-        <div className="w-full md:w-80 flex flex-col gap-4 mb-4 md:mb-0">
-          {/* AI Generator Box */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        {/* Sidebar / Controls - Right Side */}
+        <div className="w-full md:w-80 flex flex-col gap-6">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
             <div className="flex items-center space-x-2 mb-4">
               <Sparkles size={18} className="text-amber-500" />
-              <h2 className="font-bold text-slate-800 dark:text-white">AI Palette Generator</h2>
+              <h2 className="font-bold text-slate-800 dark:text-white">AI Generator</h2>
             </div>
-            <form onSubmit={handleAiGeneration} className="space-y-3">
+            <form onSubmit={handleAiGeneration} className="space-y-4">
               <textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="e.g. 'Ocean sunset at dusk' or 'Cyberpunk neon city'"
-                className="w-full h-24 p-3 rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
+                placeholder="e.g. 'Nordic winter forest'"
+                className="w-full h-24 p-4 rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-950 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
               />
               <button 
                 type="submit"
                 disabled={isAiLoading || !aiPrompt.trim()}
-                className={`w-full py-2.5 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all ${
+                className={`w-full py-3 rounded-xl font-bold flex items-center justify-center space-x-2 transition-all ${
                   isAiLoading 
                   ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' 
-                  : 'bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                 }`}
               >
                 {isAiLoading ? (
-                  <>
-                    <RefreshCw className="animate-spin" size={16} />
-                    <span>Thinking...</span>
-                  </>
+                  <RefreshCw className="animate-spin" size={18} />
                 ) : (
                   <>
-                    <Sparkles size={16} />
-                    <span>Generate with AI</span>
+                    <Sparkles size={18} />
+                    <span>Generate AI Palette</span>
                   </>
                 )}
               </button>
             </form>
           </div>
 
-          {/* Quick Controls */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 md:flex-1 flex flex-col">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-800 dark:text-white">Controls</h2>
-              <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-widest px-2 py-1 bg-slate-50 dark:bg-slate-800 rounded">Pro Tools</span>
+              <h2 className="font-bold text-slate-800 dark:text-white">Pro Controls</h2>
+              <span className="text-[10px] uppercase font-bold text-slate-400 px-2 py-1 bg-slate-50 dark:bg-slate-800 rounded">Tools</span>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-4">
               <button 
                 onClick={generateNewColors}
-                className="w-full group py-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/30 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold transition-all flex items-center justify-center space-x-2"
+                className="w-full group py-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold transition-all flex items-center justify-center space-x-2"
               >
                 <RefreshCw size={18} className="group-hover:rotate-180 transition-transform duration-500" />
-                <span>Randomize (Space)</span>
+                <span>Shuffle (Space)</span>
               </button>
               
-              <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="grid grid-cols-2 gap-3">
                 <button 
                   onClick={() => handleHarmonyClick('COMPLEMENTARY')}
-                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                  className="py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Complementary
                 </button>
                 <button 
                   onClick={() => handleHarmonyClick('TRIADIC')}
-                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                  className="py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Triadic
                 </button>
                 <button 
                   onClick={() => handleHarmonyClick('ANALOGOUS')}
-                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                  className="py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Analogous
                 </button>
                 <button 
                   onClick={() => handleHarmonyClick('MONOCHROMATIC')}
-                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                  className="py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Monochrome
                 </button>
               </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 hidden md:block">
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Tip: Press <kbd className="px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono">Space</kbd> to quickly shuffle unlocked colors.
-              </p>
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <button 
+                onClick={handleExportJson}
+                className="w-full py-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 flex items-center justify-center space-x-2 hover:underline"
+              >
+                <Download size={14} />
+                <span>Export JSON Palette</span>
+              </button>
             </div>
           </div>
         </div>
@@ -342,7 +335,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Footer / Info */}
       <footer className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 py-4 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-4">
           <div className="flex items-center space-x-4">
@@ -353,17 +345,10 @@ const App: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center space-x-1">
-              <span>SCSS</span>
+            <a href="https://github.com" target="_blank" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center space-x-1">
+              <span>GitHub</span>
               <ExternalLink size={10} />
-            </button>
-            <button 
-              onClick={handleExportJson}
-              className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center space-x-1 font-semibold"
-            >
-              <Download size={10} />
-              <span>Export JSON</span>
-            </button>
+            </a>
           </div>
         </div>
       </footer>
