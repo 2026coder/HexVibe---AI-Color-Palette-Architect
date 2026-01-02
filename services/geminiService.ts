@@ -1,8 +1,7 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 export const getAIPalette = async (prompt: string): Promise<string[]> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",

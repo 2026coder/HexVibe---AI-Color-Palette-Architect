@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, Sparkles, History, Github, ExternalLink, Trash2, Moon, Sun, Download } from 'lucide-react';
 import { ColorInfo, Palette } from './types';
-import { generateRandomHex, downloadJson } from './utils/colorUtils';
+import { generateRandomHex, downloadJson, generateHarmony } from './utils/colorUtils';
 import ColorCard from './components/ColorCard';
 import { getAIPalette } from './services/geminiService';
 
@@ -44,6 +43,18 @@ const App: React.FC = () => {
   const generateNewColors = useCallback(() => {
     setColors(prev => prev.map(c => c.locked ? c : { ...c, hex: generateRandomHex() }));
   }, []);
+
+  const handleHarmonyClick = (type: 'ANALOGOUS' | 'COMPLEMENTARY' | 'MONOCHROMATIC' | 'TRIADIC') => {
+    // Use the first color as base, or the first unlocked color
+    const baseColor = colors.find(c => c.locked)?.hex || colors[0].hex;
+    const harmonyHexes = generateHarmony(baseColor, type);
+    
+    setColors(prev => prev.map((c, i) => ({
+      ...c,
+      hex: harmonyHexes[i] || generateRandomHex(),
+      locked: i === 0 ? c.locked : false // Keep the first color's lock state if it was base
+    })));
+  };
 
   const handleToggleLock = (index: number) => {
     setColors(prev => prev.map((c, i) => i === index ? { ...c, locked: !c.locked } : c));
@@ -248,15 +259,30 @@ const App: React.FC = () => {
               </button>
               
               <div className="grid grid-cols-2 gap-2 mt-4">
-                {['Complementary', 'Triadic', 'Analogous', 'Monochrome'].map((mode) => (
-                  <button 
-                    key={mode}
-                    disabled
-                    className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-not-allowed text-center"
-                  >
-                    {mode}
-                  </button>
-                ))}
+                <button 
+                  onClick={() => handleHarmonyClick('COMPLEMENTARY')}
+                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                >
+                  Complementary
+                </button>
+                <button 
+                  onClick={() => handleHarmonyClick('TRIADIC')}
+                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                >
+                  Triadic
+                </button>
+                <button 
+                  onClick={() => handleHarmonyClick('ANALOGOUS')}
+                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                >
+                  Analogous
+                </button>
+                <button 
+                  onClick={() => handleHarmonyClick('MONOCHROMATIC')}
+                  className="py-2 rounded-lg border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-center"
+                >
+                  Monochrome
+                </button>
               </div>
             </div>
 
