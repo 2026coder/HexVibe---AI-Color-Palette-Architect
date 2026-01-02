@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Sparkles, History, Github, ExternalLink, Trash2, Moon, Sun, Download } from 'lucide-react';
+import { RefreshCw, Sparkles, History, Github, ExternalLink, Trash2, Moon, Sun, Download, Youtube, Music } from 'lucide-react';
 import { ColorInfo, Palette } from './types';
 import { generateRandomHex, downloadJson, generateHarmony } from './utils/colorUtils';
 import ColorCard from './components/ColorCard';
@@ -163,7 +163,7 @@ const App: React.FC = () => {
               )}
             </button>
             <a 
-              href="https://github.com" 
+              href="https://github.com/2026coder" 
               target="_blank" 
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden sm:block"
             >
@@ -181,7 +181,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex flex-col md:flex-row p-4 md:p-8 gap-8 max-w-[1600px] mx-auto w-full">
-        {/* Color Palette Display - Updated to 3-column square grid */}
+        {/* Color Palette Display */}
         <div className="flex-1 overflow-y-auto">
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {colors.map((color, idx) => (
@@ -197,7 +197,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Sidebar / Controls - Right Side */}
+        {/* Sidebar / Controls */}
         <div className="w-full md:w-80 flex flex-col gap-6">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
             <div className="flex items-center space-x-2 mb-4">
@@ -335,19 +335,45 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <footer className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 py-4 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-4">
-          <div className="flex items-center space-x-4">
-            <span>© 2024 HexVibe Color Lab</span>
+      {/* Footer with Social Links and New Date */}
+      <footer className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 py-6 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-6">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <span className="font-semibold text-slate-600 dark:text-slate-400">Built on 2 January 2026</span>
+            <span className="hidden md:block text-slate-300 dark:text-slate-700">|</span>
             <span className="flex items-center space-x-1">
               <Sparkles size={12} className="text-indigo-500" />
               <span>AI Powered by Gemini</span>
             </span>
           </div>
-          <div className="flex items-center space-x-4">
-            <a href="https://github.com" target="_blank" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center space-x-1">
-              <span>GitHub</span>
-              <ExternalLink size={10} />
+
+          <div className="flex items-center space-x-6">
+            <a 
+              href="https://www.tiktok.com/@my365journeycode" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center space-x-1.5 group"
+            >
+              <Music size={14} className="group-hover:scale-110 transition-transform" />
+              <span className="font-bold">TikTok</span>
+            </a>
+            <a 
+              href="https://www.youtube.com/@365Jurney" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-red-600 dark:hover:text-red-400 transition-all flex items-center space-x-1.5 group"
+            >
+              <Youtube size={14} className="group-hover:scale-110 transition-transform" />
+              <span className="font-bold">YouTube</span>
+            </a>
+            <a 
+              href="https://github.com/2026coder" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 dark:hover:text-white transition-all flex items-center space-x-1.5 group"
+            >
+              <Github size={14} className="group-hover:scale-110 transition-transform" />
+              <span className="font-bold">GitHub</span>
             </a>
           </div>
         </div>
